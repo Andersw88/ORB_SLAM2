@@ -1,0 +1,13 @@
+<launch>
+  
+  <node pkg="rosbag" type="play" name="player" args="--clock -r 2 --pause  /home/anders/bagfiles/V1_01_easy.bag /cam0/image_raw:=/camera/image_raw" output="screen"/>
+
+    <!--<node pkg="rosbag" type="play" name="player" args="-
+    -clock -r 1  /home/anders/bagfiles/lab/test3.bag /usb_cam/image_raw:=/camera/image_raw" output="screen"/>-->
+
+
+  <node pkg="orb_slam2" type="Mono" name="Mono" args="$(find orb_slam2)/../../../Vocabulary/ORBvoc.txt $(find orb_slam2)/../../Monocular/EuRoC.yaml" output="screen"/>
+
+  
+
+</launch>

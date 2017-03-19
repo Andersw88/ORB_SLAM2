@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(orb_slam2)
 
-rosbuild_init()
+# rosbuild_init()
+find_package(catkin REQUIRED)
 
-IF(NOT ROS_BUILD_TYPE)
-  SET(ROS_BUILD_TYPE Release)
-ENDIF()
+# IF(NOT ROS_BUILD_TYPE)
+#   SET(ROS_BUILD_TYPE Release)
+# ENDIF()
 
 MESSAGE("Build type: " ${ROS_BUILD_TYPE})
 
@@ -30,6 +31,9 @@ endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 
+
+
+
 find_package(OpenCV 3.0 QUIET)
 if(NOT OpenCV_FOUND)
    find_package(OpenCV 2.4.3 QUIET)
@@ -38,14 +42,15 @@ if(NOT OpenCV_FOUND)
    endif()
 endif()
 
-find_package(Eigen3 3.1.0 REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(Pangolin REQUIRED)
 
-include_directories(
-${PROJECT_SOURCE_DIR}
-${PROJECT_SOURCE_DIR}/../../../
-${PROJECT_SOURCE_DIR}/../../../include
-${Pangolin_INCLUDE_DIRS}
+find_package(catkin REQUIRED COMPONENTS
+  cmake_modules
+  roscpp
+  sensor_msgs
+  image_transport
+  cv_bridge
 )
 
 set(LIBS 
@@ -57,41 +62,58 @@ ${PROJECT_SOURCE_DIR}/../../../Thirdparty/g2o/lib/libg2o.so
 ${PROJECT_SOURCE_DIR}/../../../lib/libORB_SLAM2.so
 )
 
+catkin_package(
+  INCLUDE_DIRS ../../../include
+  CATKIN_DEPENDS roscpp tf
+  LIBRARIES orb_slam2 ${LIBS}
+)
+
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/../../../
+  ${PROJECT_SOURCE_DIR}/../../../include
+  ${Pangolin_INCLUDE_DIRS}
+)
+
 # Node for monocular camera
-rosbuild_add_executable(Mono
-src/ros_mono.cc
+add_executable(Mono
+  src/ros_mono.cc
 )
 
 target_link_libraries(Mono
-${LIBS}
+  ${catkin_LIBRARIES}
+  ${LIBS}
+  profiler
 )
 
-# Node for monocular camera (Augmented Reality Demo)
-rosbuild_add_executable(MonoAR
-src/AR/ros_mono_ar.cc
-src/AR/ViewerAR.h
-src/AR/ViewerAR.cc
-)
+# # Node for monocular camera (Augmented Reality Demo)
+# add_executable(MonoAR
+#   src/AR/ros_mono_ar.cc
+#   src/AR/ViewerAR.h
+#   src/AR/ViewerAR.cc
+# )
 
-target_link_libraries(MonoAR
-${LIBS}
-)
+# target_link_libraries(MonoAR
+#   ${catkin_LIBRARIES}
+# )
 
-# Node for stereo camera
-rosbuild_add_executable(Stereo
-src/ros_stereo.cc
-)
+# # Node for stereo camera
+# add_executable(Stereo
+#   src/ros_stereo.cc
+# )
 
-target_link_libraries(Stereo
-${LIBS}
-)
+# target_link_libraries(Stereo
+#   ${catkin_LIBRARIES}
+# )
 
-# Node for RGB-D camera
-rosbuild_add_executable(RGBD
-src/ros_rgbd.cc
-)
+# # Node for RGB-D camera
+# add_executable(RGBD
+#   src/ros_rgbd.cc
+# )
 
-target_link_libraries(RGBD
-${LIBS}
-)
+# target_link_libraries(RGBD
+#   ${catkin_LIBRARIES}
+# )
 

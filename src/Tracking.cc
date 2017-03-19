@@ -164,75 +164,75 @@ void Tracking::SetViewer(Viewer *pViewer)
 }
 
 
-cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp)
-{
-    mImGray = imRectLeft;
-    cv::Mat imGrayRight = imRectRight;
+// cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp)
+// {
+//     mImGray = imRectLeft;
+//     cv::Mat imGrayRight = imRectRight;
 
-    if(mImGray.channels()==3)
-    {
-        if(mbRGB)
-        {
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_RGB2GRAY);
-        }
-        else
-        {
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_BGR2GRAY);
-        }
-    }
-    else if(mImGray.channels()==4)
-    {
-        if(mbRGB)
-        {
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_RGBA2GRAY);
-        }
-        else
-        {
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_BGRA2GRAY);
-        }
-    }
+//     if(mImGray.channels()==3)
+//     {
+//         if(mbRGB)
+//         {
+//             cvtColor(mImGray,mImGray,CV_RGB2GRAY);
+//             cvtColor(imGrayRight,imGrayRight,CV_RGB2GRAY);
+//         }
+//         else
+//         {
+//             cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+//             cvtColor(imGrayRight,imGrayRight,CV_BGR2GRAY);
+//         }
+//     }
+//     else if(mImGray.channels()==4)
+//     {
+//         if(mbRGB)
+//         {
+//             cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
+//             cvtColor(imGrayRight,imGrayRight,CV_RGBA2GRAY);
+//         }
+//         else
+//         {
+//             cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+//             cvtColor(imGrayRight,imGrayRight,CV_BGRA2GRAY);
+//         }
+//     }
 
-    mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+//     mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
-    Track();
+//     Track();
 
-    return mCurrentFrame.mTcw.clone();
-}
+//     return mCurrentFrame.mTcw.clone();
+// }
 
 
-cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp)
-{
-    mImGray = imRGB;
-    cv::Mat imDepth = imD;
+// cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp)
+// {
+//     mImGray = imRGB;
+//     cv::Mat imDepth = imD;
 
-    if(mImGray.channels()==3)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
-    }
-    else if(mImGray.channels()==4)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
-    }
+//     if(mImGray.channels()==3)
+//     {
+//         if(mbRGB)
+//             cvtColor(mImGray,mImGray,CV_RGB2GRAY);
+//         else
+//             cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+//     }
+//     else if(mImGray.channels()==4)
+//     {
+//         if(mbRGB)
+//             cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
+//         else
+//             cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+//     }
 
-    if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
-        imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
+//     if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
+//         imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 
-    mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+//     mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
-    Track();
+//     Track();
 
-    return mCurrentFrame.mTcw.clone();
-}
+//     return mCurrentFrame.mTcw.clone();
+// }
 
 
 cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
@@ -278,10 +278,10 @@ void Tracking::Track()
 
     if(mState==NOT_INITIALIZED)
     {
-        if(mSensor==System::STEREO || mSensor==System::RGBD)
-            StereoInitialization();
-        else
-            MonocularInitialization();
+        // if(mSensor==System::STEREO || mSensor==System::RGBD)
+        //     StereoInitialization();
+        // else
+        MonocularInitialization();
 
         mpFrameDrawer->Update(this);
 
@@ -506,59 +506,59 @@ void Tracking::Track()
 }
 
 
-void Tracking::StereoInitialization()
-{
-    if(mCurrentFrame.N>500)
-    {
-        // Set Frame pose to the origin
-        mCurrentFrame.SetPose(cv::Mat::eye(4,4,CV_32F));
+// void Tracking::StereoInitialization()
+// {
+//     if(mCurrentFrame.N>500)
+//     {
+//         // Set Frame pose to the origin
+//         mCurrentFrame.SetPose(cv::Mat::eye(4,4,CV_32F));
 
-        // Create KeyFrame
-        KeyFrame* pKFini = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
+//         // Create KeyFrame
+//         KeyFrame* pKFini = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
 
-        // Insert KeyFrame in the map
-        mpMap->AddKeyFrame(pKFini);
+//         // Insert KeyFrame in the map
+//         mpMap->AddKeyFrame(pKFini);
 
-        // Create MapPoints and asscoiate to KeyFrame
-        for(int i=0; i<mCurrentFrame.N;i++)
-        {
-            float z = mCurrentFrame.mvDepth[i];
-            if(z>0)
-            {
-                cv::Mat x3D = mCurrentFrame.UnprojectStereo(i);
-                MapPoint* pNewMP = new MapPoint(x3D,pKFini,mpMap);
-                pNewMP->AddObservation(pKFini,i);
-                pKFini->AddMapPoint(pNewMP,i);
-                pNewMP->ComputeDistinctiveDescriptors();
-                pNewMP->UpdateNormalAndDepth();
-                mpMap->AddMapPoint(pNewMP);
+//         // Create MapPoints and asscoiate to KeyFrame
+//         for(int i=0; i<mCurrentFrame.N;i++)
+//         {
+//             float z = mCurrentFrame.mvDepth[i];
+//             if(z>0)
+//             {
+//                 cv::Mat x3D = mCurrentFrame.UnprojectStereo(i);
+//                 MapPoint* pNewMP = new MapPoint(x3D,pKFini,mpMap);
+//                 pNewMP->AddObservation(pKFini,i);
+//                 pKFini->AddMapPoint(pNewMP,i);
+//                 pNewMP->ComputeDistinctiveDescriptors();
+//                 pNewMP->UpdateNormalAndDepth();
+//                 mpMap->AddMapPoint(pNewMP);
 
-                mCurrentFrame.mvpMapPoints[i]=pNewMP;
-            }
-        }
+//                 mCurrentFrame.mvpMapPoints[i]=pNewMP;
+//             }
+//         }
 
-        cout << "New map created with " << mpMap->MapPointsInMap() << " points" << endl;
+//         cout << "New map created with " << mpMap->MapPointsInMap() << " points" << endl;
 
-        mpLocalMapper->InsertKeyFrame(pKFini);
+//         mpLocalMapper->InsertKeyFrame(pKFini);
 
-        mLastFrame = Frame(mCurrentFrame);
-        mnLastKeyFrameId=mCurrentFrame.mnId;
-        mpLastKeyFrame = pKFini;
+//         mLastFrame = Frame(mCurrentFrame);
+//         mnLastKeyFrameId=mCurrentFrame.mnId;
+//         mpLastKeyFrame = pKFini;
 
-        mvpLocalKeyFrames.push_back(pKFini);
-        mvpLocalMapPoints=mpMap->GetAllMapPoints();
-        mpReferenceKF = pKFini;
-        mCurrentFrame.mpReferenceKF = pKFini;
+//         mvpLocalKeyFrames.push_back(pKFini);
+//         mvpLocalMapPoints=mpMap->GetAllMapPoints();
+//         mpReferenceKF = pKFini;
+//         mCurrentFrame.mpReferenceKF = pKFini;
 
-        mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
+//         mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
 
-        mpMap->mvpKeyFrameOrigins.push_back(pKFini);
+//         mpMap->mvpKeyFrameOrigins.push_back(pKFini);
 
-        mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
+//         mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
-        mState=OK;
-    }
-}
+//         mState=OK;
+//     }
+// }
 
 void Tracking::MonocularInitialization()
 {
@@ -806,62 +806,62 @@ void Tracking::UpdateLastFrame()
 
     mLastFrame.SetPose(Tlr*pRef->GetPose());
 
-    if(mnLastKeyFrameId==mLastFrame.mnId || mSensor==System::MONOCULAR || !mbOnlyTracking)
-        return;
+    // if(mnLastKeyFrameId==mLastFrame.mnId || mSensor==System::MONOCULAR || !mbOnlyTracking)
+    //     return;
 
-    // Create "visual odometry" MapPoints
-    // We sort points according to their measured depth by the stereo/RGB-D sensor
-    vector<pair<float,int> > vDepthIdx;
-    vDepthIdx.reserve(mLastFrame.N);
-    for(int i=0; i<mLastFrame.N;i++)
-    {
-        float z = mLastFrame.mvDepth[i];
-        if(z>0)
-        {
-            vDepthIdx.push_back(make_pair(z,i));
-        }
-    }
+    // // Create "visual odometry" MapPoints
+    // // We sort points according to their measured depth by the stereo/RGB-D sensor
+    // vector<pair<float,int> > vDepthIdx;
+    // vDepthIdx.reserve(mLastFrame.N);
+    // for(int i=0; i<mLastFrame.N;i++)
+    // {
+    //     float z = mLastFrame.mvDepth[i];
+    //     if(z>0)
+    //     {
+    //         vDepthIdx.push_back(make_pair(z,i));
+    //     }
+    // }
 
-    if(vDepthIdx.empty())
-        return;
+    // if(vDepthIdx.empty())
+    //     return;
 
-    sort(vDepthIdx.begin(),vDepthIdx.end());
+    // sort(vDepthIdx.begin(),vDepthIdx.end());
 
-    // We insert all close points (depth<mThDepth)
-    // If less than 100 close points, we insert the 100 closest ones.
-    int nPoints = 0;
-    for(size_t j=0; j<vDepthIdx.size();j++)
-    {
-        int i = vDepthIdx[j].second;
+    // // We insert all close points (depth<mThDepth)
+    // // If less than 100 close points, we insert the 100 closest ones.
+    // int nPoints = 0;
+    // for(size_t j=0; j<vDepthIdx.size();j++)
+    // {
+    //     int i = vDepthIdx[j].second;
 
-        bool bCreateNew = false;
+    //     bool bCreateNew = false;
 
-        MapPoint* pMP = mLastFrame.mvpMapPoints[i];
-        if(!pMP)
-            bCreateNew = true;
-        else if(pMP->Observations()<1)
-        {
-            bCreateNew = true;
-        }
+    //     MapPoint* pMP = mLastFrame.mvpMapPoints[i];
+    //     if(!pMP)
+    //         bCreateNew = true;
+    //     else if(pMP->Observations()<1)
+    //     {
+    //         bCreateNew = true;
+    //     }
 
-        if(bCreateNew)
-        {
-            cv::Mat x3D = mLastFrame.UnprojectStereo(i);
-            MapPoint* pNewMP = new MapPoint(x3D,mpMap,&mLastFrame,i);
+    //     if(bCreateNew)
+    //     {
+    //         cv::Mat x3D = mLastFrame.UnprojectStereo(i);
+    //         MapPoint* pNewMP = new MapPoint(x3D,mpMap,&mLastFrame,i);
 
-            mLastFrame.mvpMapPoints[i]=pNewMP;
+    //         mLastFrame.mvpMapPoints[i]=pNewMP;
 
-            mlpTemporalPoints.push_back(pNewMP);
-            nPoints++;
-        }
-        else
-        {
-            nPoints++;
-        }
+    //         mlpTemporalPoints.push_back(pNewMP);
+    //         nPoints++;
+    //     }
+    //     else
+    //     {
+    //         nPoints++;
+    //     }
 
-        if(vDepthIdx[j].first>mThDepth && nPoints>100)
-            break;
-    }
+    //     if(vDepthIdx[j].first>mThDepth && nPoints>100)
+    //         break;
+    // }
 }
 
 bool Tracking::TrackWithMotionModel()
@@ -1001,28 +1001,28 @@ bool Tracking::NeedNewKeyFrame()
     // Check how many "close" points are being tracked and how many could be potentially created.
     int nNonTrackedClose = 0;
     int nTrackedClose= 0;
-    if(mSensor!=System::MONOCULAR)
-    {
-        for(int i =0; i<mCurrentFrame.N; i++)
-        {
-            if(mCurrentFrame.mvDepth[i]>0 && mCurrentFrame.mvDepth[i]<mThDepth)
-            {
-                if(mCurrentFrame.mvpMapPoints[i] && !mCurrentFrame.mvbOutlier[i])
-                    nTrackedClose++;
-                else
-                    nNonTrackedClose++;
-            }
-        }
-    }
+    // if(mSensor!=System::MONOCULAR)
+    // {
+    //     for(int i =0; i<mCurrentFrame.N; i++)
+    //     {
+    //         if(mCurrentFrame.mvDepth[i]>0 && mCurrentFrame.mvDepth[i]<mThDepth)
+    //         {
+    //             if(mCurrentFrame.mvpMapPoints[i] && !mCurrentFrame.mvbOutlier[i])
+    //                 nTrackedClose++;
+    //             else
+    //                 nNonTrackedClose++;
+    //         }
+    //     }
+    // }
 
     bool bNeedToInsertClose = (nTrackedClose<100) && (nNonTrackedClose>70);
 
     // Thresholds
     float thRefRatio = 0.75f;
-    if(nKFs<2)
-        thRefRatio = 0.4f;
+    // if(nKFs<2)
+    //     thRefRatio = 0.4f;
 
-    if(mSensor==System::MONOCULAR)
+    // if(mSensor==System::MONOCULAR)
         thRefRatio = 0.9f;
 
     // Condition 1a: More than "MaxFrames" have passed from last keyframe insertion
@@ -1070,67 +1070,67 @@ void Tracking::CreateNewKeyFrame()
     mpReferenceKF = pKF;
     mCurrentFrame.mpReferenceKF = pKF;
 
-    if(mSensor!=System::MONOCULAR)
-    {
-        mCurrentFrame.UpdatePoseMatrices();
+    // if(mSensor!=System::MONOCULAR)
+    // {
+    //     mCurrentFrame.UpdatePoseMatrices();
 
-        // We sort points by the measured depth by the stereo/RGBD sensor.
-        // We create all those MapPoints whose depth < mThDepth.
-        // If there are less than 100 close points we create the 100 closest.
-        vector<pair<float,int> > vDepthIdx;
-        vDepthIdx.reserve(mCurrentFrame.N);
-        for(int i=0; i<mCurrentFrame.N; i++)
-        {
-            float z = mCurrentFrame.mvDepth[i];
-            if(z>0)
-            {
-                vDepthIdx.push_back(make_pair(z,i));
-            }
-        }
+    //     // We sort points by the measured depth by the stereo/RGBD sensor.
+    //     // We create all those MapPoints whose depth < mThDepth.
+    //     // If there are less than 100 close points we create the 100 closest.
+    //     vector<pair<float,int> > vDepthIdx;
+    //     vDepthIdx.reserve(mCurrentFrame.N);
+    //     for(int i=0; i<mCurrentFrame.N; i++)
+    //     {
+    //         float z = mCurrentFrame.mvDepth[i];
+    //         if(z>0)
+    //         {
+    //             vDepthIdx.push_back(make_pair(z,i));
+    //         }
+    //     }
 
-        if(!vDepthIdx.empty())
-        {
-            sort(vDepthIdx.begin(),vDepthIdx.end());
+    //     if(!vDepthIdx.empty())
+    //     {
+    //         sort(vDepthIdx.begin(),vDepthIdx.end());
 
-            int nPoints = 0;
-            for(size_t j=0; j<vDepthIdx.size();j++)
-            {
-                int i = vDepthIdx[j].second;
+    //         int nPoints = 0;
+    //         for(size_t j=0; j<vDepthIdx.size();j++)
+    //         {
+    //             int i = vDepthIdx[j].second;
 
-                bool bCreateNew = false;
+    //             bool bCreateNew = false;
 
-                MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];
-                if(!pMP)
-                    bCreateNew = true;
-                else if(pMP->Observations()<1)
-                {
-                    bCreateNew = true;
-                    mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
-                }
+    //             MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];
+    //             if(!pMP)
+    //                 bCreateNew = true;
+    //             else if(pMP->Observations()<1)
+    //             {
+    //                 bCreateNew = true;
+    //                 mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
+    //             }
 
-                if(bCreateNew)
-                {
-                    cv::Mat x3D = mCurrentFrame.UnprojectStereo(i);
-                    MapPoint* pNewMP = new MapPoint(x3D,pKF,mpMap);
-                    pNewMP->AddObservation(pKF,i);
-                    pKF->AddMapPoint(pNewMP,i);
-                    pNewMP->ComputeDistinctiveDescriptors();
-                    pNewMP->UpdateNormalAndDepth();
-                    mpMap->AddMapPoint(pNewMP);
+    //             if(bCreateNew)
+    //             {
+    //                 cv::Mat x3D = mCurrentFrame.UnprojectStereo(i);
+    //                 MapPoint* pNewMP = new MapPoint(x3D,pKF,mpMap);
+    //                 pNewMP->AddObservation(pKF,i);
+    //                 pKF->AddMapPoint(pNewMP,i);
+    //                 pNewMP->ComputeDistinctiveDescriptors();
+    //                 pNewMP->UpdateNormalAndDepth();
+    //                 mpMap->AddMapPoint(pNewMP);
 
-                    mCurrentFrame.mvpMapPoints[i]=pNewMP;
-                    nPoints++;
-                }
-                else
-                {
-                    nPoints++;
-                }
+    //                 mCurrentFrame.mvpMapPoints[i]=pNewMP;
+    //                 nPoints++;
+    //             }
+    //             else
+    //             {
+    //                 nPoints++;
+    //             }
 
-                if(vDepthIdx[j].first>mThDepth && nPoints>100)
-                    break;
-            }
-        }
-    }
+    //             if(vDepthIdx[j].first>mThDepth && nPoints>100)
+    //                 break;
+    //         }
+    //     }
+    // }
 
     mpLocalMapper->InsertKeyFrame(pKF);
 

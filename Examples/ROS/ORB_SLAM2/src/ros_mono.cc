@@ -30,6 +30,7 @@
 #include<opencv2/core/core.hpp>
 
 #include"../../../include/System.h"
+#include <gperftools/profiler.h>
 
 using namespace std;
 
@@ -63,7 +64,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nodeHandler;
     ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
 
+    ProfilerStart("orb_slam2.prof");
     ros::spin();
+    ProfilerStop();
 
     // Stop all threads
     SLAM.Shutdown();
